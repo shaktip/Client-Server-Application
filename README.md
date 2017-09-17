@@ -1,1 +1,143 @@
 # Client-Server-Application
+Report:
+Problem Definition: Client Server Application, TCP based C application, Where client sends the a text containing ; seperated text and pattern and server sends back number of occurrences of pattern found in the text.
+Test Cases Handled:
+ 
+  Error codes sent to client 
+  -1 : pattern containing other than a-z A-Z
+  -3 : text contains other than a-z A-Z and space
+  -4 : pattern missing
+  -5 : text missing
+  -6 : text length exceeding
+  -7 : pattern word length exceeding
+  0  : on success
+  
+  Few Other Test Cases On Server Side
+  1. No semicolon in the text sent from client.
+  2. Multiple semicolons in the text.
+  3. Error in creating shared variable
+  4. Error in creating Socket
+  5. Error in binding the port
+  6. Error in sending and receiving data.
+  
+  Test cases on Client Side
+  1. Error in creating Socket
+  2. Error in connecting to server of given IP address or hostname.
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+___________________________________________________________________________________
+*****source - http://www.tenouk.com/Module41a.html ******
+
+
+Connection Details:
+Server Side:
+
+Header files Required:
+#include"sys/socket.h"
+#include"netinet/in.h"
+
+Structure defined in sys/socket.h 
+PORTs available - 1024 and 65535
+
+In netinet/in.h 
+
+struct sockaddr_in {
+    short            sin_family;   
+    unsigned short   sin_port;    
+    struct in_addr   sin_addr;     
+    char             sin_zero[8];  
+};
+
+struct in_addr {
+    unsigned long s_addr;  
+};
+
+ 
+ Functions And Variables:
+  struct sockaddr_in addr, cl_addr;
+  int ret,sockfd, newsockfd;
+  
+  sockfd =  socket(AF_INET, SOCK_STREAM, 0);
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr = INADDR_ANY;
+  addr.sin_port = PORT;
+  ret = bind(sockfd, (struct sockaddr *) &addr, sizeof(addr)); 
+  newsockfd = accept(sockfd, (struct sockaddr *) &cl_addr, &len);
+  inet_ntop(AF_INET, &(cl_addr.sin_addr), clientAddr, CLADDR_LEN);
+  ret = recvfrom(newsockfd, buffer, BUF_SIZE, 0, (struct sockaddr *) &cl_addr, &len);
+ 
+  
+//Errors handled by server and codes sent to client are as follows(as per requirement) -
+
+
+Client Side
+ struct  hostent
+{
+  char    *h_name;        /* official name of host */
+  char    **h_aliases;    /* alias list */
+  int     h_addrtype;     /* host address type */
+  int     h_length;       /* length of address */
+  char    **h_addr_list;  /* list of addresses from name server */
+  #define h_addr  h_addr_list[0]  /* address, for backward compatiblity */
+};
+
+   struct sockaddr_in addr, cl_addr;  
+   int  ret;
+   
+   addr.sin_family = AF_INET;  
+   addr.sin_port = PORT;    
+   server = gethostbyname(serverAddr);
+   addr.sin_addr.s_addr = inet_addr(serverAddr)
+   ret = connect(sockfd, (struct sockaddr *) &addr, sizeof(addr));  
+   ret = sendto(sockfd, buffer, BUF_SIZE, 0, (struct sockaddr *) &addr, sizeof(addr)); 
+   ret = recvfrom(sockfd, buffer, BUF_SIZE, 0, NULL, NULL);
+_________________________________
+Function And Variable Details
+_________________________________
+The variable serv_addr is a structure of type struct sockaddr_in. This structure has four fields. The first field is short sin_family, which contains a code for the address family. It should always be set to the symbolic constant AF_INET.
+
+serv_addr.sin_addr.s_addr = INADDR_ANY;
+The third field of sockaddr_in is a structure of type struct in_addr which contains only a single field unsigned long s_addr. This field contains the IP address of the host. For server code, this will always be the IP address of the machine on which the server is running, and there is a symbolic constant INADDR_ANY which gets this address.
+   
+   
+  if (bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0)
+  error("ERROR on binding");
+The bind() system call binds a socket to an address, in this case the address of the current host and port number on which the server will run. It takes three arguments, the socket file descriptor, the address to which is bound, and the size of the address to which it is bound. The second argument is a pointer to a structure of type sockaddr, but what is passed in is a structure of type sockaddr_in, and so this must be cast to the correct type.
+
+listen(sockfd,5);
+The listen system call allows the process to listen on the socket for connections. The first argument is the socket file descriptor, and the second is the size of the backlog queue, i.e., the number of connections that can be waiting while the process is handling a particular connection. This should be set to 5, the maximum size permitted by most systems. If the first argument is a valid socket
+
+
+
+struct hostent *gethostbyname(char *name)
+Takes such a name as an argument and returns a pointer to a hostent containing information about that host.
+
+if (connect(sockfd,&serv_addr,sizeof(serv_addr)) < 0)
+  error("ERROR connecting");
+  
+
+n = recvfrom(sock,buf,1024,0,(struct sockaddr *)&from,&fromlen);
+  if (n < 0) error("recvfrom");
+  
+n = sendto(sock,"Got your message" , 17 , 0 , (struct sockaddr *) &from,fromlen);
+  if (n  < 0)
+    error("sendto");   
+ This also takes six arguments. The first three are the same as for a write() call, the socket file descriptor, the buffer from which the message will be written, and the number of bytes to write. The fourth argument is an int argument called flags, which is normally zero. The fifth argument is a pointer to a sockadd_in structure. This will contain the address to which the message will be sent. Notice that in this case, since the server is replying to a message, the values of this structure were provided by the recvfrom call. The last argument is the size of this structure.    
